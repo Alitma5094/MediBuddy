@@ -1,85 +1,15 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:medibuddy/medication_page.dart';
 import 'package:medibuddy/medication_add_modal.dart';
 import 'package:medibuddy/models/database_handler.dart';
 import 'package:medibuddy/models/medication.dart';
-import 'package:path_provider/path_provider.dart';
+
 import 'package:medibuddy/medication_detail.dart';
-import 'package:http/http.dart' as http;
-import 'dart:io';
+import 'package:medibuddy/settings_page.dart';
 
-class NamesStorage {
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
+import 'package:medibuddy/name_storage.dart';
 
-    return directory.path;
-  }
-
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/medication_names.txt');
-  }
-
-  Future<List<String>> search(String query) async {
-    if (query.length < 3) {
-      return [query];
-    }
-    final names = await readNames();
-    final List<String> filteredList = [query];
-
-    for (var name in names) {
-      if (name.toLowerCase().contains(query.toLowerCase())) {
-        filteredList.add(name);
-      }
-    }
-
-    return filteredList;
-  }
-
-  Future<List<String>> readNames() async {
-    try {
-      final file = await _localFile;
-
-      final contents = await file.readAsString();
-      // Change to '\n'
-      final newMeds = contents.split("@");
-      return newMeds.toList();
-    } catch (e) {
-      return [""];
-    }
-  }
-
-  Future<File> updateNames() async {
-    // Check if names were updated more than 1 week ago (add setting to change interval)
-    // Fetch names from https://rxnav.nlm.nih.gov/REST/displaynames.json
-    final response = await http.get(
-      Uri.parse(
-        'https://rxnav.nlm.nih.gov/REST/displaynames.json',
-      ),
-    );
-    var webMeds = [];
-    if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
-      webMeds = body["displayTermsList"]["term"];
-    } else {
-      print("Failed to get names");
-    }
-    // https://lhncbc.nlm.nih.gov/RxNav/APIs/api-RxNorm.getDisplayTerms.html
-    var finalMeds = "";
-    for (var med in webMeds) {
-      // Change to '\n'
-      if (!med.toString().contains("/")) {
-        finalMeds = "$finalMeds$med@";
-      }
-    }
-
-    final file = await _localFile;
-
-    return file.writeAsString(finalMeds);
-  }
-}
+final handler = DatabaseHandler();
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -94,7 +24,7 @@ class _NavigationState extends State<Navigation> {
 
   @override
   void initState() {
-    medsFuture = DatabaseHandler().fetchMedications();
+    medsFuture = handler.fetchMedications();
     NamesStorage().updateNames();
     super.initState();
   }
@@ -110,7 +40,7 @@ class _NavigationState extends State<Navigation> {
     );
 
     setState(() {
-      medsFuture = DatabaseHandler().fetchMedications();
+      medsFuture = handler.fetchMedications();
     });
   }
 
@@ -123,7 +53,6 @@ class _NavigationState extends State<Navigation> {
       builder: (context) => MedicationDetail(
         medication: medication,
         onDelete: () {
-          var handler = DatabaseHandler();
           handler.deleteMedication(medication.id);
           setState(() {
             medsFuture = handler.fetchMedications();
@@ -170,7 +99,7 @@ class _NavigationState extends State<Navigation> {
           medicationsFuture: medsFuture,
           showMedModal: (med) => showMedModal(med),
         ),
-        const Placeholder()
+        const SettingsPage()
       ][_currentPageIndex],
     );
   }

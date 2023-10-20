@@ -9,7 +9,7 @@ class DatabaseHandler {
       join(path, 'medibuddy.db'),
       onCreate: (database, version) async {
         await database.execute(
-          'CREATE TABLE medications(id TEXT PRIMARY KEY, name TEXT NOT NULL)',
+          'CREATE TABLE medications(id TEXT PRIMARY KEY, name TEXT NOT NULL, type INTEGER NOT NULL)',
         );
       },
       version: 1,
@@ -35,6 +35,5 @@ class DatabaseHandler {
       where: 'id = ?',
       whereArgs: [id],
     );
-    print("Deleted");
   }
 }
