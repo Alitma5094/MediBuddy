@@ -1,16 +1,21 @@
-# medibuddy
+# MediBuddy
 
-A new Flutter project.
+MediBuddy is a cross-platform app to help you take your medications on time.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- 💊 Keep track of your medications (with data from the [National Library of Medicine](https://lhncbc.nlm.nih.gov/RxNav/APIs/api-RxNorm.getDisplayTerms.html))
+- 🔔 Set helpful reminders
+- 📊 Log when you take you medication and how much you take
+- 🔒 100% Private (All data stays on your device)
+- 🌙 Dark mode
+- 🌈 Material You dynamic color themes
 
-A few resources to get you started if this is your first Flutter project:
+## Build Process
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Follow the [Flutter install guide](https://docs.flutter.dev/get-started/install) for getting started building Flutter apps. **A Mac is required if you wish to develop for iOS.**
+- Clone or download the repo
+- `flutter pub get` to install dependencies
+- `flutter build apk` to build to for Android or `flutter build ios` to build for iOS
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## License
